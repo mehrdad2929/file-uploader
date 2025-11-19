@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Pico CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    
+    <style>
+        body {
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+        }
+        
+        /* Custom flash message styles that work with Pico */
+        .flash-error {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--pico-border-radius);
+            background-color: var(--pico-del-color);
+            color: var(--pico-contrast);
+            border: 1px solid var(--pico-del-color);
+        }
+        
+        .flash-success {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--pico-border-radius);
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .form-links {
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <article>
+            <header>
+                <h1>Login</h1>
+            </header>
+            
+            <!-- Flash Messages -->
+            <% if (messages.error) { %>
+                <div class="flash-error" role="alert">
+                    <strong>⚠️ Error:</strong> <%= messages.error %>
+                </div>
+            <% } %>
+            
+            <% if (messages.success) { %>
+                <div class="flash-success" role="alert">
+                    <strong>✅ Success:</strong> <%= messages.success %>
+                </div>
+            <% } %>
+            
+            <!-- Login Form -->
+            <form method="POST" action="/login">
+                <label>
+                    Username
+                    <input 
+                        type="text" 
+                        name="username" 
+                        placeholder="Enter your username" 
+                        required 
+                        autocomplete="username"
+                    />
+                </label>
+                
+                <label>
+                    Password
+                    <input 
+                        type="password" 
+                        name="password" 
+                        placeholder="Enter your password" 
+                        required
+                        autocomplete="current-password"
+                    />
+                </label>
+                
+                <button type="submit">Login</button>
+            </form>
+            
+            <footer class="form-links">
+                <small>
+                    <a href="/signup">Sign up</a>
+                </small>
+            </footer>
+        </article>
+    </main>
+</body>
+</html>

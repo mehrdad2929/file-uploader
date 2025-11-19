@@ -1,3 +1,4 @@
+const prisma = require('../db/prisma');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
@@ -7,7 +8,9 @@ passport.use(
     new LocalStrategy(async (username, password, done) => {
         try {
             // TODO:replace with prisma(the db)
-            const user = await db.getUserWithUsername(username);
+            const user = await prisma.user.findUnique({
+                where: { username: username }
+            });
             if (!user) {
                 return done(null, false, { message: `there is no such user as ${username}` })
             }
@@ -28,7 +31,9 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
     try {
         // TODO:replace with prisma(the db)
-        const user = await db.getUserWithId(id);
+        const user = await prisma.user.findUnique({
+            where: { id: id }
+        });
         if (!user) {
             return done(null, false);
         }

@@ -1,47 +1,55 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  files     File[]
-  folders   Folder[]
+    id        Int      @id @default(autoincrement())
+    username  String   @unique
+    password  String
+    email     String?  @unique
+    name      String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    files     File[]
+    folders   Folder[]
 }
 
 model Folder {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  createdAt DateTime @default(now())
-  userId    Int
-  parentId  Int?
-  files     File[]
-  parent    Folder?  @relation("FolderHeirarchy", fields: [parentId], references: [id])
-  children  Folder[] @relation("FolderHeirarchy")
-  user      User     @relation(fields: [userId], references: [id])
+    id        Int      @id @default(autoincrement())
+    name      String?
+    createdAt DateTime @default(now())
+    userId    Int
+    parentId  Int?
+    files     File[]
+    parent    Folder?  @relation("FolderHeirarchy", fields: [parentId], references: [id])
+    children  Folder[] @relation("FolderHeirarchy")
+    user      User     @relation(fields: [userId], references: [id])
 }
 
 model File {
-  id        Int      @id @default(autoincrement())
-  name      String?
-  createdAt DateTime @default(now())
-  userId    Int
-  folderId  Int?
-  folder    Folder?  @relation(fields: [folderId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+    id        Int      @id @default(autoincrement())
+    name      String?
+    createdAt DateTime @default(now())
+    userId    Int
+    folderId  Int?
+    folder    Folder?  @relation(fields: [folderId], references: [id])
+    user      User     @relation(fields: [userId], references: [id])
 }
 
 model Session {
-  id        String   @id
-  sid       String   @unique
-  data      String
-  expiresAt DateTime
+    id        String   @id
+    sid       String   @unique
+    data      String
+    expiresAt DateTime
 }
+
+// gonna need a model for shared links
+// model sharedLinks{
+//
+// }

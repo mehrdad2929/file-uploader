@@ -3,15 +3,20 @@ const express = require('express')
 const path = require('path');
 const appRouter = require('./routes/appRoutes');
 const passport = require('./config/passport');
+const { setUser } = require('./middewares/auth')
 const session = require('express-session');
 const expressSession = require('express-session');
+const flash = require('connect-flash')
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
-const { PrismaClient } = require('@prisma/client');
+const prisma = require('./db/prisma');
 const app = express()
 
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
 app.use(session({
     store: new PrismaSessionStore(
-        new PrismaClient(),
+        prisma,
         {
             checkPeriod: 2 * 60 * 1000,
             dbRecordIdIsSessionId: true,
@@ -29,8 +34,11 @@ app.use(session({
         maxAge: 30 * 24 * 60 * 60 * 1000
     }
 }));
-app.use(passport.initialize());
-app.use(passport.session());
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.messages = req.flash();
+    next();
+})
 
 //NOTE:starting passport(making it available on all routes)
 app.use(passport.initialize());
@@ -38,12 +46,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 //NOTE:make user available to all views
 app.use(setUser);
+app.use('/', appRouter)
 app.use((err, req, res, next) => {
     console.error(err);
     res.status(err.statusCode || 500).send(err.message);
 });
 // choose a port
-const PORT = 3009;
+const PORT = 3000;
 app.listen(PORT, (error) => {
     if (error) {
         throw error;
