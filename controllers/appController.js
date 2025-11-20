@@ -2,6 +2,34 @@ const prisma = require('../db/prisma');
 const passport = require('passport');
 const bcrypt = require('bcryptjs');
 
+exports.getHome = async (req, res) => {
+    const userInfo = await prisma.user.findUnique({
+        where: {
+            id: req.user.id
+        }
+    })
+    const userFiles = await prisma.file.findMany({
+        where: {
+            userId: req.user.id
+        }
+    })
+    console.log('userFiles:', userFiles)
+    res.render('index', {
+        title: 'home page',
+        userInfo: userInfo,
+        userFiles: userFiles
+    })
+}
+
+exports.postUpload = async (req, res) => {
+    await prisma.file.create({
+        data: {
+            name: req.file.originalname,
+            userId: req.user.id
+        }
+    });
+    res.redirect('/');
+}
 exports.getLogin = async (req, res) => {
     res.render('login', { title: 'login page' })
 }
@@ -23,12 +51,12 @@ exports.getSignup = async (req, res) => {
 }
 exports.postSignup = async (req, res, next) => {
     try {
-        console.log('req:', req.body);
         const { username, password } = req.body;
         const existingUsername = await prisma.user.findUnique({
             where: { username: username }
         });
         if (existingUsername) {
+            console.log('existingUsername:', existingUsername);
             req.flash('error', 'Username already taken');
             res.redirect('/signup');
         }
@@ -45,6 +73,7 @@ exports.postSignup = async (req, res, next) => {
             res.redirect('/');  // Go straight to home, logged in!
         });
     } catch (err) {
+        console.log('error in the catch:', err)
         return next(err);
     }
 }

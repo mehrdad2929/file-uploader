@@ -8,7 +8,6 @@ function setUser(req, res, next) {
 }
 function redirectIfAuthenticated(req, res, next) {
     if (!req.isAuthenticated()) {
-        console.log('boring')
         return next();
     }
     return res.redirect('/');

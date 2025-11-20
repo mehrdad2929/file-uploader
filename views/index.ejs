@@ -1,0 +1,145 @@
+<!-- views/index.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= title %></title>
+  <style>
+    .files-container {
+      margin-top: 2rem;
+    }
+    .file-item {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .file-item:hover {
+      background-color: #f5f5f5;
+    }
+    .file-info {
+      flex: 1;
+    }
+    .modal-form {
+      margin: 1rem 0;
+    }
+    .modal-form button {
+      width: 100%;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h1><%= title %></h1>
+  <button onclick="openUploadFileModal()" class="outline">upload new file</button>
+  
+  <!-- Upload File Modal -->
+  <dialog id="uploadFile">
+    <article>
+      <h3>Upload New File</h3>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="avatar" />
+        <button type="submit" class="secondary outline">submit</button>
+      </form>
+    </article>
+  </dialog>
+
+  <!-- Files List -->
+  <div class="files-container">
+    <h2>Your Files</h2>
+    <% if (userFiles && userFiles.length > 0) { %>
+      <% userFiles.forEach(function(file) { %>
+        <div class="file-item">
+          <div class="file-info">
+            <strong>Name:</strong> <%= file.name || 'Unnamed File' %><br>
+            <strong>Created:</strong> <%= new Date(file.createdAt).toLocaleString() %>
+          </div>
+          <button onclick="openOptionsModal(<%= file.id %>)" class="outline">Options</button>
+        </div>
+
+        <!-- Options Modal for each file -->
+        <dialog id="optionsModal-<%= file.id %>">
+          <article>
+            <header>
+              <h3>File Options: <%= file.name || 'Unnamed File' %></h3>
+              <button aria-label="Close" rel="prev" onclick="closeOptionsModal(<%= file.id %>)"></button>
+            </header>
+            
+            <!-- Download Form -->
+            <div class="modal-form">
+              <form action="/files/<%= file.id %>/download" method="get">
+                <button type="submit" class="secondary">📥 Download</button>
+              </form>
+            </div>
+
+            <!-- Share Form -->
+            <div class="modal-form">
+              <form action="/files/<%= file.id %>/share" method="post">
+                <button type="submit" class="secondary">🔗 Share</button>
+              </form>
+            </div>
+
+            <!-- Move to Folder Form -->
+            <div class="modal-form">
+              <form action="/files/<%= file.id %>/move" method="post">
+                <label for="folderId-<%= file.id %>">Select Folder:</label>
+                <select name="folderId" id="folderId-<%= file.id %>" required>
+                  <option value="">-- Select Folder --</option>
+                  <!-- You'll need to pass folders from controller -->
+                  <!-- Example: -->
+                  <!-- <% if (typeof folders !== 'undefined') { %>
+                    <% folders.forEach(folder => { %>
+                      <option value="<%= folder.id %>"><%= folder.name %></option>
+                    <% }); %>
+                  <% } %> -->
+                </select>
+                <button type="submit" class="secondary">📁 Move</button>
+              </form>
+            </div>
+
+            <!-- Delete Form -->
+            <div class="modal-form">
+              <form action="/files/<%= file.id %>/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this file?')">
+                <button type="submit" class="contrast">🗑️ Delete</button>
+              </form>
+            </div>
+          </article>
+        </dialog>
+      <% }); %>
+    <% } else { %>
+      <p>No files uploaded yet.</p>
+    <% } %>
+  </div>
+
+  <script>
+    // Upload modal functions
+    function openUploadFileModal() {
+      document.getElementById('uploadFile')?.showModal();
+    }
+    
+    function closeUploadFileModal() {
+      document.getElementById('uploadFile')?.close();
+    }
+
+    // Options modal functions
+    function openOptionsModal(fileId) {
+      document.getElementById(`optionsModal-${fileId}`)?.showModal();
+    }
+    
+    function closeOptionsModal(fileId) {
+      document.getElementById(`optionsModal-${fileId}`)?.close();
+    }
+    
+    // Close on outside click
+    document.querySelectorAll('dialog').forEach(dialog => {
+      dialog.addEventListener('click', function(event) {
+        if (event.target === this) {
+          this.close();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

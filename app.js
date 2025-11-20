@@ -5,7 +5,6 @@ const appRouter = require('./routes/appRoutes');
 const passport = require('./config/passport');
 const { setUser } = require('./middewares/auth')
 const session = require('express-session');
-const expressSession = require('express-session');
 const flash = require('connect-flash')
 const { PrismaSessionStore } = require('@quixo3/prisma-session-store');
 const prisma = require('./db/prisma');
@@ -29,9 +28,9 @@ app.use(session({
     name: 'MyCoolWebAppCookieName',
     resave: false,
     cookie: {
-        secure: true,
-        sameSite: 'none',
-        maxAge: 30 * 24 * 60 * 60 * 1000
+        httpOnly: true,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        sameSite: 'lax',   // <--- allow local dev
     }
 }));
 app.use(flash());
