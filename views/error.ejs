@@ -1,0 +1,77 @@
+<!-- views/error.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <style>
+        .error-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .error-title {
+            color: #d32f2f;
+            margin-bottom: 1rem;
+        }
+        .error-message {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+        .error-code {
+            font-size: 0.9rem;
+            color: #999;
+            font-family: monospace;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <div class="error-container">
+            <!-- Error icon based on status -->
+            <div class="error-icon">
+                <% if (typeof statusCode !== 'undefined') { %>
+                    <% if (statusCode === 404) { %>
+                        🔍
+                    <% } else if (statusCode === 403 || statusCode === 401) { %>
+                        🔒
+                    <% } else if (statusCode === 410) { %>
+                        ⏰
+                    <% } else { %>
+                        ⚠️
+                    <% } %>
+                <% } else { %>
+                    ⚠️
+                <% } %>
+            </div>
+            
+            <h1 class="error-title"><%= title %></h1>
+            
+            <p class="error-message"><%= message %></p>
+            
+            <div>
+                <a href="/" role="button">← Go to Home</a>
+                <% if (typeof user !== 'undefined' && !user) { %>
+                    <a href="/login" role="button" class="secondary">Login</a>
+                <% } %>
+            </div>
+            
+            <!-- Optional: Show error code in development -->
+            <% if (typeof statusCode !== 'undefined') { %>
+                <div class="error-code">
+                    Error Code: <%= statusCode %>
+                </div>
+            <% } %>
+        </div>
+    </main>
+</body>
+</html>

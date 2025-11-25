@@ -9,36 +9,39 @@ datasource db {
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
-    username  String   @unique
-    password  String
-    email     String?  @unique
-    name      String?
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    files     File[]
-    folders   Folder[]
+    id          Int          @id @default(autoincrement())
+    username    String       @unique
+    password    String
+    email       String?      @unique
+    name        String?
+    createdAt   DateTime     @default(now())
+    updatedAt   DateTime     @updatedAt
+    files       File[]
+    folders     Folder[]
+    sharedLinks sharedLink[]
 }
 
 model Folder {
-    id        Int      @id @default(autoincrement())
-    name      String?
-    createdAt DateTime @default(now())
-    userId    Int
-    parentId  Int?
-    files     File[]
-    parent    Folder?  @relation("FolderHeirarchy", fields: [parentId], references: [id])
-    children  Folder[] @relation("FolderHeirarchy")
-    user      User     @relation(fields: [userId], references: [id])
+    id          Int          @id @default(autoincrement())
+    name        String?
+    createdAt   DateTime     @default(now())
+    userId      Int
+    parentId    Int?
+    files       File[]
+    parent      Folder?      @relation("FolderHeirarchy", fields: [parentId], references: [id], onDelete: Cascade)
+    children    Folder[]     @relation("FolderHeirarchy")
+    user        User         @relation(fields: [userId], references: [id])
+    sharedLinks sharedLink[]
 }
 
 model File {
     id        Int      @id @default(autoincrement())
     name      String?
+    path      String
     createdAt DateTime @default(now())
     userId    Int
     folderId  Int?
-    folder    Folder?  @relation(fields: [folderId], references: [id])
+    folder    Folder?  @relation(fields: [folderId], references: [id], onDelete: Cascade)
     user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -50,6 +53,13 @@ model Session {
 }
 
 // gonna need a model for shared links
-// model sharedLinks{
-//
-// }
+model sharedLink {
+    id        Int      @id @default(autoincrement())
+    token     String   @unique
+    folderId  Int
+    userId    Int
+    expiresAt DateTime
+    createdAt DateTime @default(now())
+    folder    Folder   @relation(fields: [folderId], references: [id], onDelete: Cascade)
+    user      User     @relation(fields: [userId], references: [id])
+}

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <style>
+        .share-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            text-align: center;
+        }
+        .share-url {
+            background: #f5f5f5;
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+            word-break: break-all;
+            font-family: monospace;
+        }
+        .copy-button {
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="share-container">
+        <h1>✅ Share Link Created!</h1>
+        
+        <p>Folder: <strong><%= folder.name || 'Unnamed Folder' %></strong></p>
+        <p>Expires: <strong><%= new Date(expiresAt).toLocaleDateString() %></strong></p>
+        
+        <div class="share-url" id="shareUrl">
+            <%= shareUrl %>
+        </div>
+        
+        <button class="copy-button" onclick="copyToClipboard()">
+            📋 Copy Link
+        </button>
+        
+        <p>
+            <a href="/">← Back to Home</a>
+        </p>
+    </div>
+    
+    <script>
+        function copyToClipboard() {
+            const urlText = document.getElementById('shareUrl').textContent.trim();
+            
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert('Link copied to clipboard!');
+            }).catch(err => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = urlText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Link copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

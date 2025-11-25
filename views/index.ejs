@@ -33,6 +33,12 @@
 </head>
 <body>
   <h1><%= title %></h1>
+<div class="breadcrumbs">
+  <a href="/">🏠 Home</a>
+  <% breadcrumbs.forEach(folder => { %>
+    / <a href="/folder/<%= folder.id %>"><%= folder.name %></a>
+  <% }) %>
+</div>
   <button onclick="openUploadFileModal()" class="outline">upload new file</button>
   
   <!-- Upload File Modal -->
@@ -40,12 +46,68 @@
     <article>
       <h3>Upload New File</h3>
       <form action="/upload" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="folderId" value="<%= currentFolder ? currentFolder.id : '' %>">
         <input type="file" name="avatar" />
         <button type="submit" class="secondary outline">submit</button>
       </form>
     </article>
   </dialog>
+<!-- Create folder button -->
+<button onclick="openCreateFolderModal()">📁 New Folder</button>
 
+<!-- Create Folder Modal -->
+<dialog id="createFolder">
+  <article>
+    <h3>Create New Folder</h3>
+    <form action="/folder/create" method="post">
+      <input type="hidden" name="parentId" value="<%= currentFolder ? currentFolder.id : '' %>">
+      <input type="text" name="folderName" placeholder="Folder name" required />
+      <button type="submit">Create</button>
+    </form>
+  </article>
+</dialog>
+<!-- Display folders -->
+<div class="folders-container">
+  <h3>Folders</h3>
+  <% if (userFolders && userFolders.length > 0) { %>
+<% userFolders.forEach(function(folder) { %>
+    <div class="folder-item">
+        <a href="/folder/<%= folder.id %>">📁 <%= folder.name || 'Unnamed Folder' %></a>
+        <button onclick="openFolderOptionsModal(<%= folder.id %>)">Options</button>
+    </div>
+
+    <!-- Folder Options Modal -->
+    <dialog id="folderOptionsModal-<%= folder.id %>">
+        <article>
+            <header>
+                <h3>Folder Options: <%= folder.name || 'Unnamed Folder' %></h3>
+                <button aria-label="Close" onclick="closeFolderOptionsModal(<%= folder.id %>)"></button>
+            </header>
+            
+            <!-- Delete Form -->
+            <div class="modal-form">
+                <form action="/folder/<%= folder.id %>/delete" method="post" 
+                      onsubmit="return confirm('Delete this folder and ALL its contents? This cannot be undone!')">
+                    <button type="submit" class="contrast">🗑️ Delete Folder</button>
+                </form>
+            </div>
+            <div class="modal-form">
+                <form action="/folder/<%= folder.id %>/share" method="post">
+                    <label for="duration-<%= folder.id %>">Share for:</label>
+                    <select name="duration" id="duration-<%= folder.id %>" required>
+                        <option value="1">1 day</option>
+                        <option value="7">7 days</option>
+                        <option value="30">30 days</option>
+                        <option value="365">1 year</option>
+                    </select>
+                    <button type="submit" class="secondary">🔗 Generate Share Link</button>
+                </form>
+            </div>
+        </article>
+    </dialog>
+<% }); %>
+  <% } %>
+</div>
   <!-- Files List -->
   <div class="files-container">
     <h2>Your Files</h2>
@@ -74,12 +136,6 @@
               </form>
             </div>
 
-            <!-- Share Form -->
-            <div class="modal-form">
-              <form action="/files/<%= file.id %>/share" method="post">
-                <button type="submit" class="secondary">🔗 Share</button>
-              </form>
-            </div>
 
             <!-- Move to Folder Form -->
             <div class="modal-form">
@@ -114,7 +170,7 @@
   </div>
 
   <script>
-    // Upload modal functions
+    // Upload file modal functions
     function openUploadFileModal() {
       document.getElementById('uploadFile')?.showModal();
     }
@@ -123,7 +179,15 @@
       document.getElementById('uploadFile')?.close();
     }
 
-    // Options modal functions
+    // new folder modal functions
+    function openCreateFolderModal() {
+      document.getElementById('createFolder')?.showModal();
+    }
+    
+    function closeCreateFolderModal() {
+      document.getElementById('createFolder')?.close();
+    }
+    // file options modal functions
     function openOptionsModal(fileId) {
       document.getElementById(`optionsModal-${fileId}`)?.showModal();
     }
@@ -131,7 +195,14 @@
     function closeOptionsModal(fileId) {
       document.getElementById(`optionsModal-${fileId}`)?.close();
     }
-    
+    // folder options modal functions
+     function openFolderOptionsModal(folderId) {
+        document.getElementById(`folderOptionsModal-${folderId}`)?.showModal();
+    }
+
+    function closeFolderOptionsModal(folderId) {
+        document.getElementById(`folderOptionsModal-${folderId}`)?.close();
+    }   
     // Close on outside click
     document.querySelectorAll('dialog').forEach(dialog => {
       dialog.addEventListener('click', function(event) {

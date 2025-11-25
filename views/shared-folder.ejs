@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+</head>
+<body>
+    <h1>📁 <%= folder.name || 'Shared Folder' %></h1>
+    <p>This link expires: <%= new Date(expiresAt).toLocaleString() %></p>
+    
+    <h2>Files</h2>
+    <% if (files && files.length > 0) { %>
+        <ul>
+            <% files.forEach(file => { %>
+                <li>
+                    <%= file.name || 'Unnamed File' %>
+                    <a href="/share/<%= token %>/download/<%= file.id %>">download</a>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No files in this folder.</p>
+    <% } %>
+    
+</body>
+</html>
