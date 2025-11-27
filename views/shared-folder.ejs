@@ -1,25 +1,115 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="light">
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><%= title %></title>
+    
+    <!-- Pico CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    
+    <style>
+        body {
+            padding: 2rem 0;
+        }
+        
+        .folder-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--pico-card-background-color);
+            border-radius: var(--pico-border-radius);
+            border: 1px solid var(--pico-muted-border-color);
+        }
+        
+        .folder-header h1 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .expiry-notice {
+            color: var(--pico-muted-color);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        
+        .files-section {
+            margin-top: 2rem;
+        }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            margin: 0.75rem 0;
+            background: var(--pico-card-background-color);
+            border: 1px solid var(--pico-muted-border-color);
+            border-radius: var(--pico-border-radius);
+            transition: all 0.2s ease;
+        }
+        
+        .file-item:hover {
+            border-color: var(--pico-primary);
+            box-shadow: 0 0 0 2px var(--pico-primary-focus);
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: var(--pico-color);
+            flex: 1;
+        }
+        
+        .file-item a {
+            text-decoration: none;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--pico-muted-color);
+            font-style: italic;
+        }
+        
+        .download-btn {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
-    <h1>📁 <%= folder.name || 'Shared Folder' %></h1>
-    <p>This link expires: <%= new Date(expiresAt).toLocaleString() %></p>
-    
-    <h2>Files</h2>
-    <% if (files && files.length > 0) { %>
-        <ul>
-            <% files.forEach(file => { %>
-                <li>
-                    <%= file.name || 'Unnamed File' %>
-                    <a href="/share/<%= token %>/download/<%= file.id %>">download</a>
-                </li>
-            <% }); %>
-        </ul>
-    <% } else { %>
-        <p>No files in this folder.</p>
-    <% } %>
-    
+    <main class="container">
+        <article class="folder-header">
+            <h1>📁 <%= folder.name || 'Shared Folder' %></h1>
+            <p class="expiry-notice">
+                🕒 This link expires: <strong><%= new Date(expiresAt).toLocaleString() %></strong>
+            </p>
+        </article>
+        
+        <section class="files-section">
+            <h2>Files</h2>
+            <% if (files && files.length > 0) { %>
+                <ul class="file-list">
+                    <% files.forEach(file => { %>
+                        <li class="file-item">
+                            <span class="file-name">📄 <%= file.name || 'Unnamed File' %></span>
+                            <a href="/share/<%= token %>/download/<%= file.id %>" 
+                               role="button" 
+                               class="outline download-btn">
+                                📥 Download
+                            </a>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% } else { %>
+                <div class="empty-state">
+                    <p>📭 No files in this folder.</p>
+                </div>
+            <% } %>
+        </section>
+    </main>
 </body>
 </html>

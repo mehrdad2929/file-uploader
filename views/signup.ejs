@@ -41,6 +41,12 @@
 </head>
 <body>
     <main class="container">
+ <% if (messages.error) { %>
+            <article style="background-color: #f8d7da; color: #721c24; border-color: #f5c6cb;">
+                <%= messages.error %>
+            </article>
+        <% } %>
+        
         <article>
             <header>
                 <h1>Sign Up</h1>

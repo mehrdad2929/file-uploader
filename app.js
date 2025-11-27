@@ -45,6 +45,20 @@ app.use(passport.initialize());
 app.use(passport.session());
 //NOTE:make user available to all views
 app.use(setUser);
+// app.js - Add this BEFORE your routes
+app.use((err, req, res, next) => {
+    if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+            req.flash('error', 'File too large. Maximum size is 40MB.');
+            return res.redirect('/');
+        }
+        req.flash('error', `Upload error: ${err.message}`);
+        return res.redirect('/');
+    }
+
+    // Pass to next error handler
+    next(err);
+});
 app.use('/', appRouter)
 app.use((err, req, res, next) => {
     console.error(err);
