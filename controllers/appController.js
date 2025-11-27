@@ -5,7 +5,6 @@ const passport = require('passport');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const supabase = require('../config/supabase');
-const { v4: uuidv4 } = require('uuid');
 
 
 //TODO:gonna come back to this project and implement move for file and folder
@@ -208,7 +207,7 @@ exports.postUpload = async (req, res) => {
 
         // Generate unique filename to avoid collisions
         const fileExt = req.file.originalname.split('.').pop();
-        const fileName = `${uuidv4()}.${fileExt}`;
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
         const filePath = `${req.user.id}/${fileName}`;  // Organize by user ID
 
         // Upload to Supabase Storage
