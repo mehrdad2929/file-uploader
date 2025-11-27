@@ -3,7 +3,7 @@ const { isAuthenticated, redirectIfAuthenticated } = require('../middewares/auth
 const upload = require('../middewares/upload.js');
 const appController = require('../controllers/appController')
 const appRouter = Router();
-
+appRouter.get('/files/:id/preview', isAuthenticated, appController.previewFile);
 appRouter.get('/', isAuthenticated, appController.getHome)
 appRouter.get('/folder/:folderId', isAuthenticated, appController.getFolderView)
 appRouter.post('/folder/create', isAuthenticated, appController.postCreateFolder)

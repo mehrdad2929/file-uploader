@@ -385,6 +385,28 @@
                 <%= formatFileSize(file.size) %> · <%= new Date(file.createdAt).toLocaleDateString() %>
               </div>
             </div>
+            <div class="file-preview">
+                <% if (file.mimeType && file.mimeType.startsWith('image/')) { %>
+                    <img src="/files/<%= file.id %>/preview" alt="<%= file.name %>">
+                <% } %>
+                <% if (file.mimeType && file.mimeType.startsWith('video/')) { %>
+                    <video controls>
+                        <source src="/files/<%= file.id %>/preview" type="<%= file.mimeType %>">
+                        Your browser doesn't support video playback.
+                    </video>
+                <% } %>
+                <% if (file.mimeType && file.mimeType.startsWith('audio/')) { %>
+                    <audio controls>
+                        <source src="/files/<%= file.id %>/preview" type="<%= file.mimeType %>">
+                        Your browser doesn't support audio playback.
+                    </audio>
+                <% } %>
+                <% if (file.mimeType === 'application/pdf') { %>
+                    <a href="/files/<%= file.id %>/preview" target="_blank" class="secondary">
+                         View PDF
+                    </a>
+                <% } %>
+            </div>
             <button onclick="openOptionsModal(<%= file.id %>)">•••</button>
           </div>
 

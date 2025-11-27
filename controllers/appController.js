@@ -548,6 +548,38 @@ exports.downloadFile = async (req, res) => {
         res.redirect('/');
     }
 };
+exports.previewFile = async (req, res) => {
+    const fileId = parseInt(req.params.id);
+
+    try {
+        const file = await prisma.file.findFirst({
+            where: { id: fileId, userId: req.user.id }
+        });
+
+        if (!file) {
+            return res.status(404).send('File not found');
+        }
+
+        // Get file from Supabase
+        const { data, error } = await supabase.storage
+            .from(process.env.SUPABASE_BUCKET)
+            .download(file.path);
+
+        if (error) {
+            return res.status(500).send('Failed to load file');
+        }
+
+        const buffer = Buffer.from(await data.arrayBuffer());
+
+        // Set correct content type so browser displays it
+        res.setHeader('Content-Type', file.mimeType);
+        res.send(buffer);
+
+    } catch (err) {
+        console.error('Preview error:', err);
+        res.status(500).send('Failed to preview file');
+    }
+};
 exports.getLogin = async (req, res) => {
     res.render('login', { title: 'login page' })
 }

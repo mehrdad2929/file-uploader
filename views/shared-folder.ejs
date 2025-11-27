@@ -78,6 +78,24 @@
         .download-btn {
             white-space: nowrap;
         }
+        
+        .file-preview {
+            margin-top: 1rem;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .file-preview img,
+        .file-preview video {
+            width: 100%;
+            height: auto;
+            border-radius: var(--pico-border-radius);
+            border: 1px solid var(--pico-muted-border-color);
+        }
+        
+        .file-preview audio {
+            width: 100%;
+        }
     </style>
 </head>
 <body>
@@ -95,7 +113,45 @@
                 <ul class="file-list">
                     <% files.forEach(file => { %>
                         <li class="file-item">
-                            <span class="file-name">📄 <%= file.name || 'Unnamed File' %></span>
+                            <div>
+                                <span class="file-name">📄 <%= file.name || 'Unnamed File' %></span>
+
+                                  <div class="item-meta">
+                                    <%= formatFileSize(file.size) %> · <%= new Date(file.createdAt).toLocaleDateString() %>
+                                  </div>
+                                <div class="file-preview">
+                                    <% if (file.mimeType && file.mimeType.startsWith('image/')) { %>
+                                        <img src="/files/<%= file.id %>/preview" alt="<%= file.name %>">
+                                    <% } %>
+                                    <% if (file.mimeType && file.mimeType.startsWith('video/')) { %>
+                                        <video controls>
+                                            <source src="/files/<%= file.id %>/preview" type="<%= file.mimeType %>">
+                                            Your browser doesn't support video playback.
+                                        </video>
+                                    <% } %>
+                                    <% if (file.mimeType && file.mimeType.startsWith('audio/')) { %>
+                                        <audio controls>
+                                            <source src="/files/<%= file.id %>/preview" type="<%= file.mimeType %>">
+                                            Your browser doesn't support audio playback.
+                                        </audio>
+                                    <% } %>
+                                    <% if (file.mimeType === 'application/pdf') { %>
+                                        <a href="/files/<%= file.id %>/preview" target="_blank" class="secondary">
+                                             View PDF
+                                        </a>
+                                    <% } %>
+                                </div>
+
+                                  <%
+                                  function formatFileSize(bytes) {
+                                    if (!bytes) return 'Unknown';
+                                    if (bytes < 1024) return bytes + ' B';
+                                    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+                                    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+                                    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+                                  }
+                                  %>
+                            </div>
                             <a href="/share/<%= token %>/download/<%= file.id %>" 
                                role="button" 
                                class="outline download-btn">
